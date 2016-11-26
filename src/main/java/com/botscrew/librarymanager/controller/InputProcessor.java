@@ -12,7 +12,7 @@ public class InputProcessor {
     @Autowired
     private InputParser parser;
 
-    public void processInput(String input) {
+    public int processInput(String input) {
         if (parser.parseCommand(input) != null) {
             switch (parser.parseCommand(input)) {
                 case ADD:
@@ -33,10 +33,12 @@ public class InputProcessor {
                 case EXIT:
                     bookController.exit();
                     break;
+                default:
+                    return -1;
             }
         } else {
-            bookController.output("Wrong command. Please, try again. \nType 'help' for more information.");
+            return -1;
         }
-        processInput(bookController.input());
+        return processInput(bookController.input());
     }
 }

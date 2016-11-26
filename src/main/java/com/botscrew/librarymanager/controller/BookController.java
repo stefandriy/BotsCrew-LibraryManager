@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.ResourceBundle;
 
 @Component
 public class BookController {
@@ -21,9 +22,15 @@ public class BookController {
     @Autowired
     InputProcessor inputProcessor;
 
+    private ResourceBundle rb = ResourceBundle.getBundle("text-resources");
+
     public void start() {
         greet();
-        inputProcessor.processInput(input());
+        int result = inputProcessor.processInput(input());
+        while (result == -1) {
+            output(rb.getString("unrecognized_command"));
+            result = inputProcessor.processInput(input());
+        }
     }
 
     public String input() {
@@ -34,7 +41,7 @@ public class BookController {
         try {
             return Integer.parseInt(view.input());
         } catch (NumberFormatException e) {
-            output("Wrong number. Try again:");
+            output(rb.getString("not_integer"));
             return inputInteger();
         }
     }
@@ -44,61 +51,61 @@ public class BookController {
     }
 
     public void greet() {
-        output("Hello!");
-        output("If you don't know what to do type 'help'");
+        output(rb.getString("hello"));
+        output(rb.getString("type_help"));
     }
 
     public void add(Book book) {
         bookRepository.save(book);
-        output("Book " + book + " was added.");
+        output(String.format(rb.getString("book_was_added"), book));
     }
 
     public void edit(String name) {
         List<Book> books = (List<Book>) bookRepository.findByName(name);
         if (books.size() > 1) {
-            output("We have few books with such name. Please, choose one by typing a number of book:");
+            output(rb.getString("choose_book"));
             for (int i = 0; i < books.size(); i++) {
                 output(i + 1 + ". " + books.get(i).toString());
             }
             int number = inputInteger();
-            if (number > 0) {
+            if (number > 0 && number < books.size()) {
                 bookRepository.delete(books.get(number - 1));
-                output("Book " + books.get(number - 1) + " was removed.");
+                output(String.format(rb.getString("book_was_removed"), books.get(number - 1)));
             } else {
-                output("Wrong number: " + number);
+                output(String.format(rb.getString("wrong_number"), number));
                 remove(name);
             }
         } else {
             bookRepository.delete(books);
-            output("Book " + books.get(0) + " was removed.");
+            output(String.format(rb.getString("book_was_removed"), books.get(0)));
         }
     }
 
     public void remove(String name) {
         List<Book> books = (List<Book>) bookRepository.findByName(name);
         if (books.size() > 1) {
-            output("We have few books with such name. Please, choose one by typing a number of book:");
+            output(rb.getString("choose_book"));
             for (int i = 0; i < books.size(); i++) {
                 output(i + 1 + ". " + books.get(i).toString());
             }
             int number = inputInteger();
-            if (number > 0) {
+            if (number > 0 && number < books.size()) {
                 Book book = books.get(number - 1);
-                output("Enter new name for book " + book);
+                output(String.format(rb.getString("enter_new_name"), book));
                 book.setName(input());
                 bookRepository.save(book);
-                output("Book " + book + " was updated.");
+                output(String.format(rb.getString("book_was_updated"), book));
             } else {
-                output("Wrong number: " + number);
+                output(String.format(rb.getString("wrong_number"), number));
                 remove(name);
             }
         } else {
             bookRepository.delete(books);
             Book book = books.get(0);
-            output("Enter new name for book " + book);
+            output(String.format(rb.getString("enter_new_name"), book));
             book.setName(input());
             bookRepository.save(book);
-            output("Book " + book + " was updated.");
+            output(String.format(rb.getString("book_was_updated"), book));
         }
     }
 
@@ -115,7 +122,7 @@ public class BookController {
     }
 
     public void exit() {
-        output("Good bye!");
+        output(rb.getString("good_bye"));
         System.exit(0);
     }
 }
