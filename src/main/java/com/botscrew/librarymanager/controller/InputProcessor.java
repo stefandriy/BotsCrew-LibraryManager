@@ -13,7 +13,7 @@ public class InputProcessor {
     private InputParser parser;
 
     public int processInput(String input) {
-        if (parser.parseCommand(input) != null) {
+        try {
             switch (parser.parseCommand(input)) {
                 case ADD:
                     bookController.add(parser.parseBook(input));
@@ -36,7 +36,7 @@ public class InputProcessor {
                 default:
                     return -1;
             }
-        } else {
+        } catch (Exception e) {
             return -1;
         }
         return processInput(bookController.input());

@@ -2,22 +2,17 @@ package com.botscrew.librarymanager.view;
 
 import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.PrintStream;
+import java.util.Scanner;
 
 @Component
 public class ConsoleView implements View {
-    private BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    private Scanner reader = new Scanner(System.in);
     private PrintStream writer = System.out;
 
     @Override
     public String input() {
-        String input = "";
-        try {
-            input = reader.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return input;
+        return reader.hasNextLine() ? reader.nextLine() : "";
     }
 
     @Override
